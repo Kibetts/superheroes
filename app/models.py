@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import validates
 
 db = SQLAlchemy()
 
@@ -31,7 +32,7 @@ class Power(db.Model):
     @validates('description')
     def validate_description(self, key, description):
         if not description or len(description) < 20:
-          raise ValidationError('Description must be present and at least 20 characters long.')
+          raise ValueError('Description must be present and at least 20 characters long.')
     
 class HeroPower(db.Model):
     __tablename__ = 'hero_powers'
@@ -54,7 +55,7 @@ class HeroPower(db.Model):
     @validates('strength')
     def validate_strength(self, key, strength):
       if strength not in ['Strong', 'Weak', 'Average']:
-        raise ValidationError("Strength must be one of: 'Strong', 'Weak', 'Average'")
+        raise ValueError("Strength must be one of: 'Strong', 'Weak', 'Average'")
 
         
 

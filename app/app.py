@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from flask import Flask, make_response, jsonify, request
 from flask_migrate import Migrate
-from wtforms import Form, StringField, validators
 
 from models import *
 
@@ -42,15 +41,20 @@ def get_hero(hero_id):
     result['id'] = hero.id
     result['name'] = hero.name
     result['super_name'] = hero.super_name
-    result['powers'] = []
 
-    for power in hero.powers:
+    hero_powers = HeroPower.query.filter_by(hero_id=hero.id).all()
+    powers = []
+
+    for hero_power in hero_powers:
+      power = Power.query.get(hero_power.power_id)
       power_data = {}
       power_data['id'] = power.id
       power_data['name'] = power.name
       power_data['description'] = power.description
+      powers.append(power_data)
 
-      result['powers'].append(power_data)
+
+      result['powers'] = powers
 
     return jsonify(result)
 
@@ -103,7 +107,7 @@ def update_power(power_id):
   try:
     power.description = data['description']
     db.session.commit()
-  except ValidationError as e:
+  except ValueError as e:
     return jsonify({"errors": e.messages}), 400
 
   result = {}
@@ -139,7 +143,7 @@ def create_hero_power():
     db.session.add(hero_power)
     db.session.commit()
 
-  except ValidationError as e:
+  except ValueError as e:
     return jsonify({"errors": e.messages}), 400
 
   hero_data = {}
