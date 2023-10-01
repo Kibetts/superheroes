@@ -113,6 +113,51 @@ def update_power(power_id):
 
   return jsonify(result)
 
+@app.route('/hero_powers', methods=['POST'])
+def create_hero_power():
+  data = request.get_json()
+
+  if 'strength' not in data or 'power_id' not in data or 'hero_id' not in data:
+    return jsonify({"error": "Strength, power_id and hero_id are required"}), 400
+
+  hero = Hero.query.get(data['hero_id'])
+
+  if not hero:
+    return jsonify({"error": "Invalid hero_id"}), 400
+
+  power = Power.query.get(data['power_id'])
+
+  if not power:
+    return jsonify({"error": "Invalid power_id"}), 400
+
+  try:
+    hero_power = HeroPower(
+      hero_id=data['hero_id'], 
+      power_id=data['power_id'],
+      strength=data['strength']
+    )
+    db.session.add(hero_power)
+    db.session.commit()
+
+  except ValidationError as e:
+    return jsonify({"errors": e.messages}), 400
+
+  hero_data = {}
+  hero_data['id'] = hero.id
+  hero_data['name'] = hero.name
+  hero_data['super_name'] = hero.super_name
+  hero_data['powers'] = []
+
+  for power in hero.powers:
+    power_data = {}  
+    power_data['id'] = power.id
+    power_data['name'] = power.name
+    power_data['description'] = power.description
+
+    hero_data['powers'].append(power_data)
+
+  return jsonify(hero_data)
+
 
 
 
