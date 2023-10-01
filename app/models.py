@@ -6,10 +6,14 @@ class Hero(db.Model):
     __tablename__ = 'hero'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String)
-    super_name = db.Column(db.String)
-    created_at = db.Column(db.DateTime)
-    updated_at = db.Column(db.DateTime)
+    name = db.Column(db.String(80))
+    super_name = db.Column(db.String(80))
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    def __init__(self, name, super_name):
+        self.name = name
+        self.super_name = super_name
     
 class Power(db.Model):
     __tablename__ = 'powers'
