@@ -37,12 +37,24 @@ class HeroPower(db.Model):
     __tablename__ = 'hero_powers'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    strength = db.Column(db.Integer)
-    hero_id = db.Column(db.String, db.ForeignKey('hero.id'))
-    power_id = db.Column(db.String, db.ForeignKey('powers.id'))
-    created_at = db.Column(db.DateTime)
-    updated_at = db.Column(db.DateTime)
+    strength = db.Column(db.String(80))
+    hero_id = db.Column(db.Integer, db.ForeignKey('hero.id'))
+    power_id = db.Column(db.Integer, db.ForeignKey('powers.id'))
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     hero = db.relationship('Hero', backref='hero_powers')
     power = db.relationship('Power', backref='hero_powers')
+
+    def __init__(self, hero_id, power_id, strength):    
+        self.hero_id = hero_id
+        self.power_id = power_id
+        self.strength = strength
+
+    @validates('strength')
+    def validate_strength(self, key, strength):
+      if strength not in ['Strong', 'Weak', 'Average']:
+        raise ValidationError("Strength must be one of: 'Strong', 'Weak', 'Average'")
+
+        
 
