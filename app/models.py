@@ -19,10 +19,19 @@ class Power(db.Model):
     __tablename__ = 'powers'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String)
-    description = db.Column(db.String)
-    created_at = db.Column(db.DateTime)
-    updated_at = db.Column(db.DateTime)
+    name = db.Column(db.String(80))
+    description = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    def __init__(self, name, description):
+        self.name = name  
+        self.description = description
+
+    @validates('description')
+    def validate_description(self, key, description):
+        if not description or len(description) < 20:
+          raise ValidationError('Description must be present and at least 20 characters long.')
     
 class HeroPower(db.Model):
     __tablename__ = 'hero_powers'
