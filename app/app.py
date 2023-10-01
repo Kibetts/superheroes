@@ -55,6 +55,21 @@ def get_hero(hero_id):
 
   else:
     return jsonify({"error": "Hero not found"}), 404
+  
+@app.route('/powers', methods=['GET'])
+def get_powers():
+  powers = Power.query.all()
+  result = []
+
+  for power in powers:
+    power_data = {}
+    power_data['id'] = power.id
+    power_data['name'] = power.name
+    power_data['description'] = power.description
+
+    result.append(power_data)
+
+  return jsonify(result)
 
 
 
