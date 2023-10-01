@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-from flask import Flask, make_response, jsonify
+from flask import Flask, make_response, jsonify, request
 from flask_migrate import Migrate
+from wtforms import Form, StringField, validators
 
 from models import *
 
@@ -85,6 +86,32 @@ def get_power(power_id):
 
   else:
     return jsonify({"error": "Power not found"}), 404
+  
+
+@app.route('/powers/<int:power_id>', methods=['PATCH'])
+def update_power(power_id):
+  data = request.get_json()
+
+  if 'description' not in data:
+    return jsonify({"error": "Description required"}), 400
+
+  power = Power.query.get(power_id)
+
+  if not power:
+    return jsonify({"error": "Power not found"}), 404
+
+  try:
+    power.description = data['description']
+    db.session.commit()
+  except ValidationError as e:
+    return jsonify({"errors": e.messages}), 400
+
+  result = {}
+  result['id'] = power.id
+  result['name'] = power.name
+  result['description'] = power.description
+
+  return jsonify(result)
 
 
 
