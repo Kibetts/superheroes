@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
-
+#!/usr/bin/env python
 from flask import Flask, make_response
 from flask_migrate import Migrate
 
-from models import db, Hero
+from models import *
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///heroes.db'
